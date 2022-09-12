@@ -1,20 +1,91 @@
-#include <iostream>
-#include <raylib.h>
 #include "entt.hpp"
+#include <SDL2/SDL.h>
+#include <csignal>
+#include <iostream>
+
+typedef unsigned int uint;
+
+struct Movement {
+    int x, y;
+};
+
+struct Position {
+    uint x;
+    uint y;
+
+    Position operator+(const Position &other) const
+    {
+        return {x + other.x, y + other.y};
+    }
+
+    Position operator+(const Movement &other) const
+    {
+        return {x + other.x, y + other.y};
+    }
+};
+
+void update(entt::registry &registry)
+{
+    auto view = registry.view<Position, const Movement>();
+
+    view.each([](auto &pos, const auto &move) { pos = pos + move; });
+}
+
 
 int main()
 {
-    InitWindow(800, 450, "raylib [core] example - basic window");
+    std::cout << "Open Rogue Starting!" << '\n';
 
-    while (!WindowShouldClose())
-    {
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-        DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
-        EndDrawing();
+    if(SDL_Init(SDL_INIT_VIDEO) < 0) {
+        std::cout << "SDL_Init Error: " << SDL_GetError() << '\n';
+        return 1;
     }
 
-    CloseWindow();
+    SDL_Window *window = SDL_CreateWindow("Open Rogue", 100, 100, 640, 480,
+                                          SDL_WINDOW_SHOWN);
 
+    if(window == nullptr) {
+        std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << '\n';
+        SDL_Quit();
+        return 1;
+    }
+
+    SDL_Renderer *renderer = SDL_CreateRenderer(
+            window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+    if(renderer == nullptr) {
+        SDL_DestroyWindow(window);
+        std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << '\n';
+        SDL_Quit();
+        return 1;
+    }
+
+    SDL_Event event;
+    while(true) {
+        signal(SIGTERM, [](int) {
+            SDL_Quit();
+            std::cout << "SIGTERM received" << '\n';
+            exit(0);
+        });
+
+        while(SDL_PollEvent(&event)) {
+            if(event.type == SDL_QUIT) {
+                SDL_Quit();
+                std::cout << "SDL_QUIT received" << '\n';
+                exit(0);
+            }
+        }
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderDrawLine(renderer, 0, 0, 640, 480);
+
+        SDL_RenderPresent(renderer);
+    }
+
+    std::cout << "Open Rogue Closing\n See ya!" << std::endl;
+exit:
     return 0;
 }
