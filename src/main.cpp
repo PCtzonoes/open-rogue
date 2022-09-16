@@ -30,8 +30,6 @@ void update(entt::registry &registry)
 
 int main(int argc, char *argv[])
 {
-    std::cout << "Open Rogue Starting!" << '\n';
-
     InputParser input(argc, argv);
 
     if(input.cmdOptionExists("-h", "--help")) {
@@ -55,6 +53,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    std::cout << "Open Rogue Starting!" << '\n';
     SDL_Window *window =
             SDL_CreateWindow("Open Rogue", 100, 100, 640, 480, SDL_WINDOW_SHOWN);
 
