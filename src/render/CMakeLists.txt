@@ -1,0 +1,1 @@
+add_library(render_lib STATIC render.cpp)
