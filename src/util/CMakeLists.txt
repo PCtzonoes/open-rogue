@@ -1,0 +1,1 @@
+add_library(util_lib STATIC input_parser.cpp)
