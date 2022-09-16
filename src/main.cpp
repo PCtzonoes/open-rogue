@@ -40,17 +40,17 @@ int main(int argc, char *argv[])
         std::cout << "  -h, --help\t\tShow this help message and exit" << '\n';
         std::cout << "  -v, --version\t\tShow program's version number and exit" << '\n';
 
-        return 0;
+        exit(EXIT_SUCCESS);
     }
 
     if(input.cmdOptionExists("-v", "--version")) {
         std::cout << "Open Rogue Version 0.0.1" << '\n';
-        return 0;
+        exit(EXIT_SUCCESS);
     }
 
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         std::cout << "SDL_Init Error: " << SDL_GetError() << '\n';
-        return 1;
+        exit(EXIT_FAILURE);
     }
 
     std::cout << "Open Rogue Starting!" << '\n';
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     if(window == nullptr) {
         std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << '\n';
         SDL_Quit();
-        return 1;
+        exit(EXIT_FAILURE);
     }
 
     SDL_Renderer *renderer = SDL_CreateRenderer(
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
         SDL_DestroyWindow(window);
         std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << '\n';
         SDL_Quit();
-        return 1;
+        exit(EXIT_SUCCESS);
     }
 
     SDL_Event event;
@@ -78,14 +78,14 @@ int main(int argc, char *argv[])
         signal(SIGTERM, [](int) {
             SDL_Quit();
             std::cout << "SIGTERM received" << '\n';
-            exit(0);
+            exit(EXIT_SUCCESS);
         });
 
         while(SDL_PollEvent(&event)) {
             if(event.type == SDL_QUIT) {
                 SDL_Quit();
                 std::cout << "SDL_QUIT received" << '\n';
-                exit(0);
+                exit(EXIT_SUCCESS);
             }
         }
 
@@ -100,5 +100,5 @@ int main(int argc, char *argv[])
 
     std::cout << "Open Rogue Closing\n See ya!" << std::endl;
 exit:
-    return 0;
+    exit(EXIT_SUCCESS);
 }
