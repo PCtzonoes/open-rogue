@@ -1,4 +1,6 @@
 #include "entt.hpp"
+#include "render/render.hpp"
+#include "util/input_parser.hpp"
 #include <SDL2/SDL.h>
 #include <csignal>
 #include <iostream>
@@ -13,15 +15,9 @@ struct Position {
     uint x;
     uint y;
 
-    Position operator+(const Position &other) const
-    {
-        return {x + other.x, y + other.y};
-    }
+    Position operator+(const Position &other) const { return {x + other.x, y + other.y}; }
 
-    Position operator+(const Movement &other) const
-    {
-        return {x + other.x, y + other.y};
-    }
+    Position operator+(const Movement &other) const { return {x + other.x, y + other.y}; }
 };
 
 void update(entt::registry &registry)
@@ -32,17 +28,35 @@ void update(entt::registry &registry)
 }
 
 
-int main()
+int main(int argc, char *argv[])
 {
     std::cout << "Open Rogue Starting!" << '\n';
 
-    if(SDL_Init(SDL_INIT_VIDEO) < 0) {
+    InputParser input(argc, argv);
+
+    if(input.cmdOptionExists("-h", "--help")) {
+        std::cout << "Open Rogue Help" << '\n';
+
+        std::cout << "Usage: open-rogue [options]" << '\n';
+        std::cout << "Options:" << '\n';
+        std::cout << "  -h, --help\t\tShow this help message and exit" << '\n';
+        std::cout << "  -v, --version\t\tShow program's version number and exit" << '\n';
+
+        return 0;
+    }
+
+    if(input.cmdOptionExists("-v", "--version")) {
+        std::cout << "Open Rogue Version 0.0.1" << '\n';
+        return 0;
+    }
+
+    if(SDL_Init(SDL_INIT_EVERYTHING) < 0) {
         std::cout << "SDL_Init Error: " << SDL_GetError() << '\n';
         return 1;
     }
 
-    SDL_Window *window = SDL_CreateWindow("Open Rogue", 100, 100, 640, 480,
-                                          SDL_WINDOW_SHOWN);
+    SDL_Window *window =
+            SDL_CreateWindow("Open Rogue", 100, 100, 640, 480, SDL_WINDOW_SHOWN);
 
     if(window == nullptr) {
         std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << '\n';
